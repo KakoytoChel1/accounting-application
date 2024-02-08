@@ -1,0 +1,3042 @@
+﻿<Window xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"  x:Class="AccountingApp.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:AccountingApp.ViewModel"
+        xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+        xmlns:tb="http://www.hardcodet.net/taskbar"
+        mc:Ignorable="d"
+        x:Name="mainWindow"
+        Closing="mainWindow_Closing"
+        Title="Application"
+        Height="700"
+        WindowState="{Binding WindowStateProp, UpdateSourceTrigger=PropertyChanged}"
+        Width="1060"
+        MinHeight="500"
+        MinWidth="880"
+        Background="#121212"
+        WindowStartupLocation="CenterScreen"
+        Icon="Assets/appIcon2.ico">
+
+    <Window.Resources>
+        <SolidColorBrush x:Key="categoryColor" Color="{Binding ElementName=categoryColorPicker , Path=Color}"/>
+        <SolidColorBrush x:Key="categoryColorEdit" Color="{Binding ElementName=categoryColorPickerEdit , Path=Color}"/>
+        <vm:InverseBooleanConverter x:Key="InverseB"/>
+    </Window.Resources>
+
+    <Window.DataContext>
+        <vm:MainViewModel/>
+    </Window.DataContext>
+
+    <WindowChrome.WindowChrome>
+        <WindowChrome />
+    </WindowChrome.WindowChrome>
+
+    <!--Events-->
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="SelectionChanged" SourceObject="{Binding ElementName=mainListbox}">
+            <i:InvokeCommandAction Command="{Binding FinanceSelectCommand}"/>
+        </i:EventTrigger>
+
+        <i:EventTrigger EventName="SelectionChanged" SourceObject="{Binding ElementName=currencyBox}">
+            <i:InvokeCommandAction Command="{Binding CurrencyChanged}"/>
+        </i:EventTrigger>
+
+        <i:EventTrigger EventName="SelectionChanged" SourceObject="{Binding ElementName=categoryBox}">
+            <i:InvokeCommandAction Command="{Binding CategoryChanged}"/>
+        </i:EventTrigger>
+
+        <i:EventTrigger EventName="SelectionChanged" SourceObject="{Binding ElementName=typeBox}">
+            <i:InvokeCommandAction Command="{Binding TypeChanged}"/>
+        </i:EventTrigger>
+
+        <i:EventTrigger EventName="TextChanged" SourceObject="{Binding ElementName=searchBox}">
+            <i:InvokeCommandAction Command="{Binding SearchItemsCommand}"/>
+        </i:EventTrigger>
+
+        <i:EventTrigger EventName="Checked" SourceObject="{Binding ElementName=trayChecked}">
+            <i:InvokeCommandAction Command="{Binding TrayStateChanged}"/>
+        </i:EventTrigger>
+
+        <i:EventTrigger EventName="StateChanged" SourceObject="{Binding ElementName=mainWindow}">
+            <i:InvokeCommandAction Command="{Binding WindowStateChanged}" CommandParameter="{Binding ElementName=mainWindow}"/>
+        </i:EventTrigger>
+
+        <i:EventTrigger EventName="TrayLeftMouseDown" SourceObject="{Binding ElementName=trayElement}">
+            <i:InvokeCommandAction Command="{Binding ShowWindowCommand}" CommandParameter="{Binding ElementName=mainWindow}"/>
+        </i:EventTrigger>
+
+        <i:EventTrigger EventName="Click" SourceObject="{Binding ElementName=closeApp}">
+            <i:InvokeCommandAction Command="{Binding CloseByTrayCommand}" CommandParameter="{Binding ElementName=mainWindow}"/>
+        </i:EventTrigger>
+
+        <i:EventTrigger EventName="TextChanged" SourceObject="{Binding ElementName=usd_uah_text}">
+            <i:InvokeCommandAction Command="{Binding UsdTextChanged}" CommandParameter="{Binding ElementName=usd_uah_text}"/>
+        </i:EventTrigger>
+
+        <i:EventTrigger EventName="TextChanged" SourceObject="{Binding ElementName=eur_uah_text}">
+            <i:InvokeCommandAction Command="{Binding EurTextChanged}" CommandParameter="{Binding ElementName=eur_uah_text}"/>
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
+
+    <Grid x:Name="mainGrid">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="35"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition MinWidth="35" MaxWidth="250" Width="auto"/>
+            <ColumnDefinition/>
+            <ColumnDefinition x:Name="SidePanel" Width="230"/>
+        </Grid.ColumnDefinitions>
+
+
+        <!--Tray icon-->
+        <tb:TaskbarIcon
+            x:Name="trayElement"
+            IconSource="Assets/appIcon2.ico">
+            <tb:TaskbarIcon.ContextMenu>
+                <ContextMenu>
+                    <MenuItem
+                        x:Name="closeApp"
+                        Header="Close"/>
+                </ContextMenu>
+            </tb:TaskbarIcon.ContextMenu>
+        </tb:TaskbarIcon>
+        
+        <!--Side panel-->
+        <Grid
+            Grid.Column="2"
+            Grid.RowSpan="2"
+            Background="{StaticResource Gradient}">
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            
+
+            <!--Check or Add income and expense-->
+            <StackPanel
+                Grid.Row="1"
+                Orientation="Vertical"
+                Margin="0,0,0,20">
+
+                <!--Search box-->
+                <TextBox
+                    x:Name="searchBox"
+                    Grid.Column="2"
+                    Grid.ColumnSpan="2"
+                    Text="{Binding SearchContent, UpdateSourceTrigger=PropertyChanged}"
+                    Style="{DynamicResource SearchTextBox}"
+                    Margin="15,50,15,10"
+                    VerticalAlignment="Bottom">
+
+                    <TextBox.InputBindings>
+                        <KeyBinding Key="Enter" Command="{Binding SearchCommand}"/>
+                    </TextBox.InputBindings>
+
+                </TextBox>
+
+                <!--Header "Add"-->
+                <TextBlock
+                    Foreground="White"
+                    Text="Add"
+                    FontWeight="Bold"
+                    FontSize="18"
+                    Padding="25,18,0,0"
+                    TextElement.FontFamily="Fonts\#Century gothic"
+                    Margin="0,0,0,20"/>
+
+                <!--Adding income Button-->
+                <Button 
+                    Style="{DynamicResource ButtonTemplate}"
+                    Height="60"
+                    Command="{Binding SwitchToAddIncome}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="50"/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+
+                        <Image
+                            Source="Assets/income.png"
+                            Width="40"/>
+
+                        <TextBlock
+                            Grid.Column="1"
+                            Margin="0,15,0,15"
+                            Foreground="White"
+                            FontSize="15"
+                            Text="Incomes"
+                            TextAlignment="Center"
+                            Padding="10,3,80,0"/>
+                    </Grid>
+
+                    <!--Showing the menu for adding new income-->
+                    <Button.Triggers>
+                        <EventTrigger RoutedEvent="Button.Click">
+                            <EventTrigger.Actions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimationUsingKeyFrames Storyboard.TargetName="dynamic_side_panel" Storyboard.TargetProperty="(FrameworkElement.Width)">
+                                            <EasingDoubleKeyFrame KeyTime="0:0:0.1" Value="{Binding ActualWidth, ElementName=SidePanel}"/>
+                                        </DoubleAnimationUsingKeyFrames>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </EventTrigger.Actions>
+                        </EventTrigger>
+                    </Button.Triggers>
+                    
+                    <Button.ToolTip>
+                        <ToolTip>Добавить новый доход</ToolTip>
+                    </Button.ToolTip>
+                </Button>
+
+                <!--Adding expense Button-->
+                <Button 
+                    Height="60"
+                    Style="{DynamicResource ButtonTemplate}"
+                    Command="{Binding SwitchToAddExpenses}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="50"/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+
+                        <Image
+                            Source="Assets/expenses.png"
+                            Width="40"
+                            Margin="10,0,0,0"/>
+
+                        <TextBlock
+                            Grid.Column="1"
+                            Margin="0,15,0,15"
+                            Foreground="White"
+                            FontSize="15"
+                            Text="Expenses"
+                            TextAlignment="Center"
+                            Padding="10,3,80,0"/>
+                    </Grid>
+
+                    <!--Showing the menu for adding new expense-->
+                    <Button.Triggers>
+                        <EventTrigger RoutedEvent="Button.Click">
+                            <EventTrigger.Actions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimationUsingKeyFrames Storyboard.TargetName="dynamic_side_panel" Storyboard.TargetProperty="(FrameworkElement.Width)">
+                                            <EasingDoubleKeyFrame KeyTime="0:0:0.1" Value="{Binding ActualWidth, ElementName=SidePanel}"/>
+                                        </DoubleAnimationUsingKeyFrames>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </EventTrigger.Actions>
+                        </EventTrigger>
+                    </Button.Triggers>
+
+                    <Button.ToolTip>
+                        <ToolTip>Добавить новый расход</ToolTip>
+                    </Button.ToolTip>
+                </Button>
+
+            </StackPanel>
+
+            <!--Check or Add Categories-->
+            <Grid
+                Grid.Row="2">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="60"/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+
+                <Border
+                    BorderThickness="0,1,0,1"
+                    BorderBrush="Gray">
+                    <Grid Height="60">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition Width="0.5*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!--Header-->
+                        <TextBlock
+                            Foreground="White"
+                            Text="Categories"
+                            FontWeight="Bold"
+                            FontSize="18"
+                            Padding="25,18,0,0"/>
+
+                        <!--Open category adding panel-->
+                        <Button 
+                            Style="{DynamicResource RoundButtonTemplate}"
+                            Command="{Binding SwitchToAddCategory}"
+                            Grid.Column="1"
+                            Height="30"
+                            Width="30"
+                            Margin="0,0,0,0"
+                            HorizontalAlignment="Left"
+                            BorderBrush="White">
+                            
+                            <Image
+                                Source="Assets/addSomething.png"
+                                Width="19"/>
+
+                            <!--Showing the menu for adding new category-->
+                            <Button.Triggers>
+                                <EventTrigger RoutedEvent="Button.Click">
+                                    <EventTrigger.Actions>
+                                        <BeginStoryboard>
+                                            <Storyboard>
+                                                <DoubleAnimationUsingKeyFrames Storyboard.TargetName="dynamic_side_panel" Storyboard.TargetProperty="(FrameworkElement.Width)">
+                                                    <EasingDoubleKeyFrame KeyTime="0:0:0.1" Value="{Binding ActualWidth, ElementName=SidePanel}"/>
+                                                </DoubleAnimationUsingKeyFrames>
+                                            </Storyboard>
+                                        </BeginStoryboard>
+                                    </EventTrigger.Actions>
+                                </EventTrigger>
+                            </Button.Triggers>
+
+                            <Button.ToolTip>
+                                <ToolTip>Добавить новую категорию</ToolTip>
+                            </Button.ToolTip>
+                        </Button>
+                    </Grid>
+                </Border>
+
+                <!--Category list-->
+                <ListBox
+                    x:Name="categoryListBox"
+                    Grid.Row="1"
+                    Background="Transparent"
+                    BorderThickness="0"
+                    ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                    SelectedItem="{Binding SelectedCategoryItem, UpdateSourceTrigger=PropertyChanged}"
+                    ItemsSource="{Binding categoryItems}">
+
+                    <ListBox.Resources>
+                        <Style TargetType="ListBoxItem">
+                            <Setter Property="Height" Value="50"/>
+                            <Setter Property="Background" Value="Transparent"/>
+                            <Setter Property="ToolTip">
+                                <Setter.Value>
+                                    <ToolTip Content="{Binding Title}"/>
+                                </Setter.Value>
+                            </Setter>
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate>
+                                        <Border x:Name="bd">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="auto"/>
+                                                    <ColumnDefinition/>
+                                                    <ColumnDefinition Width="auto"/>
+                                                </Grid.ColumnDefinitions>
+
+                                                <Border
+                                                    Height="35"
+                                                    Width="35"
+                                                    CornerRadius="8"
+                                                    BorderThickness="2"
+                                                    BorderBrush="#27292d"
+                                                    Background="{Binding ColorHex}"
+                                                    HorizontalAlignment="Right"
+                                                    Margin="20,0,0,0">
+                                                </Border>
+
+                                                <TextBlock
+                                                    Grid.Column="1"
+                                                    Margin="0,15,0,15"
+                                                    Foreground="White"
+                                                    FontFamily="Century gothic"
+                                                    FontSize="14"
+                                                    Text="{Binding Title}"
+                                                    TextAlignment="Left"
+                                                    Padding="15,0,30,0"/>
+
+                                                <Grid
+                                                    Grid.Column="2"
+                                                    HorizontalAlignment="Right"
+                                                    Margin="10,0,10,0">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition/>
+                                                        <ColumnDefinition/>
+                                                    </Grid.ColumnDefinitions>
+
+                                                    <!--Edit Buttom-->
+                                                    <Button
+                                                        x:Name="editCategoryButton"
+                                                        Grid.Column="0"
+                                                        Margin="0,0,6,0"
+                                                        Style="{DynamicResource ButtonTemplateOpac}"
+                                                        Command="{Binding ElementName=mainWindow, Path=DataContext.SwitchToEditCategory}"
+                                                        Visibility="Hidden">
+
+                                                        <Image
+                                                            Source="Assets/edit2.png"
+                                                            Width="15"/>
+
+                                                        <Button.Triggers>
+                                                            <EventTrigger RoutedEvent="Button.Click">
+                                                                <EventTrigger.Actions>
+                                                                    <BeginStoryboard>
+                                                                        <Storyboard TargetProperty="Width" Target="{Binding ElementName=dynamic_side_panel}">
+                                                                            <DoubleAnimation
+                                                                                    From="0"
+                                                                                    To="230"
+                                                                                    Duration="0:0:0.1"/>
+                                                                        </Storyboard>
+                                                                    </BeginStoryboard>
+                                                                </EventTrigger.Actions>
+                                                            </EventTrigger>
+                                                        </Button.Triggers>
+
+                                                    </Button>
+
+                                                    <!--Remove Button-->
+                                                    <Button
+                                                        x:Name="removeCategoryButton"
+                                                        Grid.Column="1"
+                                                        Margin="0,0,5,0"
+                                                        Style="{DynamicResource ButtonTemplateOpac}"
+                                                        Command="{Binding ElementName=mainWindow, Path=DataContext.RemoveCategoryCommand}"
+                                                        Visibility="Hidden">
+
+                                                        <Image
+                                                            Source="Assets/delete.png"
+                                                            Width="16"/>
+                                                    </Button>
+
+                                                </Grid>
+
+                                            </Grid>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter Property="Background" TargetName="bd" Value="#1f2023"/>
+                                            </Trigger>
+                                            <Trigger Property="Selector.IsSelected"  Value="True">
+                                                <Setter Property="Background" TargetName="bd" Value="#27292d"/>
+                                                <Setter Property="Visibility" TargetName="removeCategoryButton" Value="Visible"/>
+                                                <Setter Property="Visibility" TargetName="editCategoryButton" Value="Visible"/>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </ListBox.Resources>
+                </ListBox>
+                
+                <!--Hint, category list is empty or not-->
+                <TextBlock
+                    Grid.Row="1"
+                    Foreground="LightGray"
+                    FontSize="14"
+                    TextElement.FontFamily="Fonts\#Century gothic"
+                    TextAlignment="Center"
+                    Width="150"
+                    TextWrapping="Wrap"
+                    VerticalAlignment="Center"
+                    Margin="0,0,0,50"
+                    Text="Category's list is empty :(">
+
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="Visibility" Value="Visible"/>
+
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding ElementName=categoryListBox, Path=HasItems}" Value="True">
+                                    <Setter Property="Visibility" Value="Hidden"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+
+                </TextBlock>
+
+            </Grid>
+
+            <!--Dynamic side panel-->
+            <Grid
+                Grid.Row="2">
+                <Border
+                    x:Name="dynamic_side_panel"
+                    HorizontalAlignment="Right"
+                    Width="0"
+                    Background="#1a1c1d"
+                    BorderThickness="0,1,0,0"
+                    BorderBrush="Gray">
+                    <Grid>
+                        <TabControl
+                            SelectedIndex="{Binding SelectedSidePanelMenu}"
+                            Background="Transparent"
+                            BorderThickness="0">
+
+                            <!--Add new income (index 0)-->
+                            <TabItem
+                                Height="0">
+
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition/>
+                                        <RowDefinition Height="50"/>
+                                        <RowDefinition Height="10"/>
+                                    </Grid.RowDefinitions>
+
+                                    <ScrollViewer
+                                        Grid.Row="0">
+
+                                        <StackPanel
+                                            Orientation="Vertical">
+
+                                            <!--Title-->
+                                            <TextBlock
+                                                Text="Name"
+                                                Style="{DynamicResource TextBlock_RSP}"/>
+                                            <Grid>
+                                                <TextBox
+                                                    Style="{DynamicResource TextBox_RSP}"
+                                                    x:Name="enterTitle_tb"
+                                                    Text="{Binding IncomeTitle, UpdateSourceTrigger=PropertyChanged}"/>
+
+                                                <TextBlock
+                                                    Foreground="Gray"
+                                                    IsHitTestVisible="False"
+                                                    Margin="10,10,20,0"
+                                                    Padding="10,8,0,0"
+                                                    FontSize="11"
+                                                    TextElement.FontFamily="Fonts\#Century gothic"
+                                                    Text="Enter something">
+
+                                                    <TextBlock.Style>
+                                                        <Style TargetType="{x:Type TextBlock}">
+                                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding Text, ElementName=enterTitle_tb}" Value="">
+                                                                    <Setter Property="Visibility" Value="Visible"/>
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </TextBlock.Style>
+
+                                                </TextBlock>
+                                            </Grid>
+
+                                            <!--Sum and currency-->
+                                            <TextBlock
+                                                Text="Sum"
+                                                Style="{DynamicResource TextBlock_RSP}"/>
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition/>
+                                                    <ColumnDefinition Width="70"/>
+                                                </Grid.ColumnDefinitions>
+
+                                                <!--Sum-->
+                                                <TextBox
+                                                    Style="{DynamicResource TextBox_RSP}"
+                                                    x:Name="enterSum_tb"
+                                                    Text="{Binding IncomeSum,
+                                                    UpdateSourceTrigger=PropertyChanged,
+                                                    StringFormat=N2}">
+
+                                                    <i:Interaction.Behaviors>
+                                                        <vm:LimitBehaviour/>
+                                                    </i:Interaction.Behaviors>
+                                                </TextBox>
+
+                                                <!--Hint-->
+                                                <TextBlock
+                                                    Foreground="Gray"
+                                                    IsHitTestVisible="False"
+                                                    Margin="10,10,20,0"
+                                                    Padding="10,8,0,0"
+                                                    FontSize="11"
+                                                    TextElement.FontFamily="Fonts\#Century gothic"
+                                                    Text="Enter sum">
+
+                                                    <TextBlock.Style>
+                                                        <Style TargetType="{x:Type TextBlock}">
+                                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding Text, ElementName=enterSum_tb}" Value="">
+                                                                    <Setter Property="Visibility" Value="Visible"/>
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </TextBlock.Style>
+
+                                                </TextBlock>
+
+                                                <!--Currency-->
+                                                <ComboBox
+                                                    Grid.Column="1"
+                                                    Width="60"
+                                                    Margin="0,10,5,0"
+                                                    Height="30"
+                                                    SelectedIndex="{Binding SelectedCurrencyIndexIncome, UpdateSourceTrigger=PropertyChanged}">
+
+                                                    <ComboBoxItem>
+                                                        <Image
+                                                            Source="Assets/dollar.png"
+                                                            Width="20"
+                                                            HorizontalAlignment="Left"/>
+                                                    </ComboBoxItem>
+                                                    <ComboBoxItem>
+                                                        <Image
+                                                            Source="Assets/euro.png"
+                                                            Width="20"
+                                                            HorizontalAlignment="Left"/>
+                                                    </ComboBoxItem>
+                                                    <ComboBoxItem>
+                                                        <Image
+                                                            Source="Assets/hryvnia.png"
+                                                            Width="20"
+                                                            HorizontalAlignment="Left"/>
+                                                    </ComboBoxItem>
+
+                                                </ComboBox>
+                                            </Grid>
+
+                                            <!--Category-->
+                                            <TextBlock
+                                                Text="Category"
+                                                Style="{DynamicResource TextBlock_RSP}"/>
+                                            <ComboBox
+                                                Margin="10,10,55,0"
+                                                SelectedValuePath="Content"
+                                                ItemsSource="{Binding category_combobox_items}"
+                                                SelectedItem="{Binding SelectedIncomeCategory, UpdateSourceTrigger=PropertyChanged}"
+                                                SelectedIndex="{Binding SelectedCategoryIncomeAdd}">
+                                                <ComboBox.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <Grid>
+                                                            <Grid.ColumnDefinitions>
+                                                                <ColumnDefinition Width="30"/>
+                                                                <ColumnDefinition/>
+                                                            </Grid.ColumnDefinitions>
+
+                                                            <Border
+                                                                Grid.Column="0"
+                                                                Width="15"
+                                                                HorizontalAlignment="Left"
+                                                                Margin="3,0,0,0"
+                                                                Height="15"
+                                                                CornerRadius="3"
+                                                                BorderThickness="0"
+                                                                Background="{Binding ColorHex}"/>
+
+                                                            <TextBlock
+                                                                Grid.Column="1"
+                                                                Text="{Binding Title}"
+                                                                Foreground="{StaticResource TextColor}"
+                                                                FontSize="11"/>
+
+                                                        </Grid>
+                                                    </DataTemplate>
+                                                </ComboBox.ItemTemplate>
+
+                                            </ComboBox>
+
+                                            <!--Description-->
+                                            <TextBlock
+                                                Text="Description"
+                                                Style="{DynamicResource TextBlock_RSP}"/>
+                                            <Grid>
+                                                <TextBox
+                                                    Style="{DynamicResource Dynamic_TextBox_RSP}"
+                                                    x:Name="enterDescription_tb"
+                                                    Text="{Binding IncomeDesc, UpdateSourceTrigger=PropertyChanged}"/>
+
+                                                <!--Hint-->
+                                                <TextBlock
+                                                    Foreground="Gray"
+                                                    IsHitTestVisible="False"
+                                                    Margin="10,10,20,0"
+                                                    Padding="10,8,0,0"
+                                                    FontSize="11"
+                                                    TextElement.FontFamily="Fonts\#Century gothic"
+                                                    Text="Enter something">
+
+                                                    <TextBlock.Style>
+                                                        <Style TargetType="{x:Type TextBlock}">
+                                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding Text, ElementName=enterDescription_tb}" Value="">
+                                                                    <Setter Property="Visibility" Value="Visible"/>
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </TextBlock.Style>
+
+                                                </TextBlock>
+                                            </Grid>
+
+                                        </StackPanel>
+
+                                    </ScrollViewer>
+
+                                    <Grid
+                                        Grid.Row="1">
+
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition/>
+                                            <ColumnDefinition Width="50"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <!--Adding Button-->
+                                        <Button
+                                            Grid.Row="1"
+                                            Style="{DynamicResource AddIncomeButton_RSP}"
+                                            Command="{Binding AddNewIncomeCommand}"
+                                            IsEnabled="{Binding ElementName=enterSum_tb, Path=(Validation.HasError), Converter={StaticResource InverseB}}">
+
+                                            <!--Closing the menu for adding new income-->
+                                            <Button.Triggers>
+                                                <EventTrigger RoutedEvent="Button.Click">
+                                                    <EventTrigger.Actions>
+                                                        <BeginStoryboard>
+                                                            <Storyboard>
+                                                                <DoubleAnimationUsingKeyFrames Storyboard.TargetName="dynamic_side_panel" Storyboard.TargetProperty="(FrameworkElement.Width)">
+                                                                    <EasingDoubleKeyFrame KeyTime="0:0:0.1" Value="0"/>
+                                                                </DoubleAnimationUsingKeyFrames>
+                                                            </Storyboard>
+                                                        </BeginStoryboard>
+                                                    </EventTrigger.Actions>
+                                                </EventTrigger>
+                                            </Button.Triggers>
+
+                                        </Button>
+
+                                        <!--Closing Button-->
+                                        <Button
+                                            Grid.Column="1"
+                                            Command="{Binding CloseIncomeAddCommand}"
+                                            Style="{DynamicResource ClosePanelButton_RSP}">
+
+                                            <!--Closing the menu for adding new income-->
+                                            <Button.Triggers>
+                                                <EventTrigger RoutedEvent="Button.Click">
+                                                    <EventTrigger.Actions>
+                                                        <BeginStoryboard>
+                                                            <Storyboard>
+                                                                <DoubleAnimationUsingKeyFrames Storyboard.TargetName="dynamic_side_panel" Storyboard.TargetProperty="(FrameworkElement.Width)">
+                                                                    <EasingDoubleKeyFrame KeyTime="0:0:0.1" Value="0"/>
+                                                                </DoubleAnimationUsingKeyFrames>
+                                                            </Storyboard>
+                                                        </BeginStoryboard>
+                                                    </EventTrigger.Actions>
+                                                </EventTrigger>
+                                            </Button.Triggers>
+
+                                        </Button>
+                                    </Grid>
+
+                                </Grid>
+
+                            </TabItem>
+
+                            <!--Add new expense (index 1)-->
+                            <TabItem
+                                Height="0">
+
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition/>
+                                        <RowDefinition Height="50"/>
+                                        <RowDefinition Height="10"/>
+                                    </Grid.RowDefinitions>
+
+                                    <ScrollViewer
+                                        Grid.Row="0">
+
+                                        <StackPanel
+                                            Orientation="Vertical">
+
+                                            <!--Title-->
+                                            <TextBlock
+                                                Text="Name"
+                                                Style="{DynamicResource TextBlock_RSP}"/>
+                                            <Grid>
+                                                <TextBox
+                                                    Style="{DynamicResource TextBox_RSP}"
+                                                    x:Name="enterTitle_tb3"
+                                                    Text="{Binding ExpensesTitle, UpdateSourceTrigger=PropertyChanged}"/>
+
+                                                <!--Hint-->
+                                                <TextBlock
+                                                    Foreground="Gray"
+                                                    IsHitTestVisible="False"
+                                                    Margin="10,10,20,0"
+                                                    Padding="10,8,0,0"
+                                                    FontSize="11"
+                                                    TextElement.FontFamily="Fonts\#Century gothic"
+                                                    Text="Enter something">
+
+                                                    <TextBlock.Style>
+                                                        <Style TargetType="{x:Type TextBlock}">
+                                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding Text, ElementName=enterTitle_tb3}" Value="">
+                                                                    <Setter Property="Visibility" Value="Visible"/>
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </TextBlock.Style>
+
+                                                </TextBlock>
+                                            </Grid>
+
+                                            <!--Sum and currency-->
+                                            <TextBlock
+                                                Text="Sum"
+                                                Style="{DynamicResource TextBlock_RSP}"/>
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition/>
+                                                    <ColumnDefinition Width="70"/>
+                                                </Grid.ColumnDefinitions>
+
+                                                <!--Sum-->
+                                                <TextBox
+                                                    Style="{DynamicResource TextBox_RSP}"
+                                                    x:Name="enterSum_tb3"
+                                                    Text="{Binding ExpensesSum, UpdateSourceTrigger=PropertyChanged,StringFormat=N2 }">
+
+                                                    <i:Interaction.Behaviors>
+                                                        <vm:LimitBehaviour/>
+                                                    </i:Interaction.Behaviors>
+                                                    
+                                                </TextBox>
+                                                
+                                                <!--Hint-->
+                                                <TextBlock
+                                                    Foreground="Gray"
+                                                    IsHitTestVisible="False"
+                                                    Margin="10,10,20,0"
+                                                    Padding="10,8,0,0"
+                                                    FontSize="11"
+                                                    TextElement.FontFamily="Fonts\#Century gothic"
+                                                    Text="Enter something">
+
+                                                    <TextBlock.Style>
+                                                        <Style TargetType="{x:Type TextBlock}">
+                                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding Text, ElementName=enterSum_tb3}" Value="">
+                                                                    <Setter Property="Visibility" Value="Visible"/>
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </TextBlock.Style>
+
+                                                </TextBlock>
+
+                                                <!--Currency-->
+                                                <ComboBox
+                                                    Grid.Column="1"
+                                                    Width="60"
+                                                    Margin="0,10,5,0"
+                                                    Height="30"
+                                                    SelectedIndex="{Binding SelectedCurrencyIndexExpenses, UpdateSourceTrigger=PropertyChanged}">
+
+                                                    <ComboBoxItem>
+                                                        <Image
+                                                            Source="Assets/dollar.png"
+                                                            Width="20"
+                                                            HorizontalAlignment="Left"/>
+                                                    </ComboBoxItem>
+                                                    <ComboBoxItem>
+                                                        <Image
+                                                            Source="Assets/euro.png"
+                                                            Width="20"
+                                                            HorizontalAlignment="Left"/>
+                                                    </ComboBoxItem>
+                                                    <ComboBoxItem>
+                                                        <Image
+                                                            Source="Assets/hryvnia.png"
+                                                            Width="20"
+                                                            HorizontalAlignment="Left"/>
+                                                    </ComboBoxItem>
+
+                                                </ComboBox>
+                                            </Grid>
+
+                                            <!--Category-->
+                                            <TextBlock
+                                                Text="Category"
+                                                Style="{DynamicResource TextBlock_RSP}"/>
+                                            <ComboBox
+                                                Margin="10,10,55,0"
+                                                SelectedValuePath="Content"
+                                                ItemsSource="{Binding category_combobox_items}"
+                                                SelectedItem="{Binding SelectedExpensesCategory, UpdateSourceTrigger=PropertyChanged}"
+                                                SelectedIndex="{Binding SelectedCategoryExpensesAdd}">
+
+                                                <ComboBox.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <Grid>
+                                                            <Grid.ColumnDefinitions>
+                                                                <ColumnDefinition Width="30"/>
+                                                                <ColumnDefinition/>
+                                                            </Grid.ColumnDefinitions>
+
+                                                            <Border
+                                                                Grid.Column="0"
+                                                                Width="15"
+                                                                HorizontalAlignment="Left"
+                                                                Margin="3,0,0,0"
+                                                                Height="15"
+                                                                CornerRadius="3"
+                                                                BorderThickness="0"
+                                                                Background="{Binding ColorHex}"/>
+
+                                                            <TextBlock
+                                                                Grid.Column="1"
+                                                                Text="{Binding Title}"
+                                                                Foreground="{StaticResource TextColor}"
+                                                                FontSize="11"/>
+
+                                                        </Grid>
+                                                    </DataTemplate>
+                                                </ComboBox.ItemTemplate>
+
+                                            </ComboBox>
+
+                                            <!--Description-->
+                                            <TextBlock
+                                                Text="Description"
+                                                Style="{DynamicResource TextBlock_RSP}"/>
+                                            <Grid>
+                                                <TextBox
+                                                    Style="{DynamicResource Dynamic_TextBox_RSP}"
+                                                    x:Name="enterDescription_tb3"
+                                                    Text="{Binding ExpensesDesc, UpdateSourceTrigger=PropertyChanged}"/>
+                                                <!--Hint-->
+                                                <TextBlock
+                                                    Foreground="Gray"
+                                                    IsHitTestVisible="False"
+                                                    Margin="10,10,20,0"
+                                                    Padding="10,8,0,0"
+                                                    FontSize="11"
+                                                    TextElement.FontFamily="Fonts\#Century gothic"
+                                                    Text="Enter something">
+
+                                                    <TextBlock.Style>
+                                                        <Style TargetType="{x:Type TextBlock}">
+                                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding Text, ElementName=enterDescription_tb3}" Value="">
+                                                                    <Setter Property="Visibility" Value="Visible"/>
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </TextBlock.Style>
+
+                                                </TextBlock>
+                                            </Grid>
+
+                                        </StackPanel>
+
+                                    </ScrollViewer>
+
+                                    <Grid
+                                        Grid.Row="1">
+
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition/>
+                                            <ColumnDefinition Width="50"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <!--Adding Button-->
+                                        <Button
+                                            Grid.Row="1"
+                                            Style="{DynamicResource AddExpensesButton_RSP}"
+                                            Command="{Binding AddNewExpensesCommand}"
+                                            IsEnabled="{Binding ElementName=enterSum_tb3, Path=(Validation.HasError), Converter={StaticResource InverseB}}">
+
+                                            <!--Closing the menu for adding new expense-->
+                                            <Button.Triggers>
+                                                <EventTrigger RoutedEvent="Button.Click">
+                                                    <EventTrigger.Actions>
+                                                        <BeginStoryboard>
+                                                            <Storyboard>
+                                                                <DoubleAnimationUsingKeyFrames Storyboard.TargetName="dynamic_side_panel" Storyboard.TargetProperty="(FrameworkElement.Width)">
+                                                                    <EasingDoubleKeyFrame KeyTime="0:0:0.1" Value="0"/>
+                                                                </DoubleAnimationUsingKeyFrames>
+                                                            </Storyboard>
+                                                        </BeginStoryboard>
+                                                    </EventTrigger.Actions>
+                                                </EventTrigger>
+                                            </Button.Triggers>
+
+                                        </Button>
+
+                                        <!--Closing Button-->
+                                        <Button
+                                            Grid.Column="1"
+                                            Command="{Binding CloseExpensesAddCommand}"
+                                            Style="{DynamicResource ClosePanelButton_RSP}">
+
+                                            <!--Closing the menu for adding new expense-->
+                                            <Button.Triggers>
+                                                <EventTrigger RoutedEvent="Button.Click">
+                                                    <EventTrigger.Actions>
+                                                        <BeginStoryboard>
+                                                            <Storyboard>
+                                                                <DoubleAnimationUsingKeyFrames Storyboard.TargetName="dynamic_side_panel" Storyboard.TargetProperty="(FrameworkElement.Width)">
+                                                                    <EasingDoubleKeyFrame KeyTime="0:0:0.1" Value="0"/>
+                                                                </DoubleAnimationUsingKeyFrames>
+                                                            </Storyboard>
+                                                        </BeginStoryboard>
+                                                    </EventTrigger.Actions>
+                                                </EventTrigger>
+                                            </Button.Triggers>
+
+                                        </Button>
+                                    </Grid>
+
+                                </Grid>
+
+                            </TabItem>
+
+                            <!--Edit panel (index 2)-->
+                            <TabItem
+                                Height="0">
+
+                                <Grid
+                                    DataContext="{Binding SelectedFinanceItem}">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition/>
+                                        <RowDefinition Height="50"/>
+                                        <RowDefinition Height="10"/>
+                                    </Grid.RowDefinitions>
+
+                                    <ScrollViewer
+                                        Grid.Row="0">
+
+                                        <StackPanel
+                                            Orientation="Vertical">
+                                            <!--Title-->
+                                            <TextBlock
+                                                Style="{DynamicResource TextBlock_RSP}"
+                                                Text="Name"/>
+                                            <Grid>
+                                                <TextBox
+                                                    Style="{DynamicResource TextBox_RSP}"
+                                                    x:Name="enterTitle_tb4"
+                                                    Text="{Binding Title, UpdateSourceTrigger=PropertyChanged}"/>
+
+                                                <!--Hint-->
+                                                <TextBlock
+                                                    Foreground="Gray"
+                                                    IsHitTestVisible="False"
+                                                    Margin="10,10,20,0"
+                                                    Padding="10,8,0,0"
+                                                    FontSize="11"
+                                                    TextElement.FontFamily="Fonts\#Century gothic"
+                                                    Text="Enter something">
+
+                                                    <TextBlock.Style>
+                                                        <Style TargetType="{x:Type TextBlock}">
+                                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding Text, ElementName=enterTitle_tb4}" Value="">
+                                                                    <Setter Property="Visibility" Value="Visible"/>
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </TextBlock.Style>
+
+                                                </TextBlock>
+                                            </Grid>
+
+                                            <!--Sum and currency-->
+                                            <TextBlock
+                                                Style="{DynamicResource TextBlock_RSP}"
+                                                Text="Sum"/>
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition/>
+                                                    <ColumnDefinition Width="70"/>
+                                                </Grid.ColumnDefinitions>
+
+                                                <TextBox
+                                                    Style="{DynamicResource TextBox_RSP}"
+                                                    x:Name="enterSum_tb4"
+                                                    Text="{Binding Sum, UpdateSourceTrigger=PropertyChanged, StringFormat=N2}">
+
+                                                    <i:Interaction.Behaviors>
+                                                        <vm:LimitBehaviour/>
+                                                    </i:Interaction.Behaviors>
+
+                                                </TextBox>
+                                                <!--Hint-->
+                                                <TextBlock
+                                                    Foreground="Gray"
+                                                    IsHitTestVisible="False"
+                                                    Margin="10,10,20,0"
+                                                    Padding="10,8,0,0"
+                                                    FontSize="11"
+                                                    TextElement.FontFamily="Fonts\#Century gothic"
+                                                    Text="Enter sum">
+
+                                                    <TextBlock.Style>
+                                                        <Style TargetType="{x:Type TextBlock}">
+                                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding Text, ElementName=enterSum_tb4}" Value="">
+                                                                    <Setter Property="Visibility" Value="Visible"/>
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </TextBlock.Style>
+
+                                                </TextBlock>
+
+                                                <!--Currency-->
+                                                <ComboBox
+                                                    x:Name="currencyBox"
+                                                    Grid.Column="1"
+                                                    Width="60"
+                                                    Margin="0,10,5,0"
+                                                    Height="30"
+                                                    SelectedIndex="{Binding ElementName=mainWindow, Path=DataContext.SelectedCurrencyIndexEdit, UpdateSourceTrigger=PropertyChanged}">
+
+                                                    <ComboBoxItem>
+                                                        <Image
+                                                            Source="Assets/dollar.png"
+                                                            Width="20"
+                                                            HorizontalAlignment="Left"/>
+                                                    </ComboBoxItem>
+                                                    <ComboBoxItem>
+                                                        <Image
+                                                            Source="Assets/euro.png"
+                                                            Width="20"
+                                                            HorizontalAlignment="Left"/>
+                                                    </ComboBoxItem>
+                                                    <ComboBoxItem>
+                                                        <Image
+                                                            Source="Assets/hryvnia.png"
+                                                            Width="20"
+                                                            HorizontalAlignment="Left"/>
+                                                    </ComboBoxItem>
+
+                                                </ComboBox>
+                                            </Grid>
+
+                                            <!--Category-->
+                                            <TextBlock
+                                                Style="{DynamicResource TextBlock_RSP}"
+                                                Text="Category"/>
+                                            <ComboBox
+                                                x:Name="categoryBox"
+                                                Margin="10,10,55,0"
+                                                SelectedValuePath="Content"
+                                                ItemsSource="{Binding ElementName=mainWindow, Path=DataContext.category_combobox_items}"
+                                                SelectedItem="{Binding ElementName=mainWindow, Path=DataContext.SelectedFinanceCategoryEdit}"
+                                                SelectedIndex="{Binding ElementName=mainWindow, Path=DataContext.SelectedFinanceIndexCategoryEdit}">
+
+                                                <ComboBox.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <Grid>
+                                                            <Grid.ColumnDefinitions>
+                                                                <ColumnDefinition Width="30"/>
+                                                                <ColumnDefinition/>
+                                                            </Grid.ColumnDefinitions>
+
+                                                            <Border
+                                                                Grid.Column="0"
+                                                                Width="15"
+                                                                HorizontalAlignment="Left"
+                                                                Margin="3,0,0,0"
+                                                                Height="15"
+                                                                CornerRadius="3"
+                                                                BorderThickness="0"
+                                                                Background="{Binding ColorHex}"/>
+
+                                                            <TextBlock
+                                                                Grid.Column="1"
+                                                                Text="{Binding Title}"
+                                                                Foreground="{StaticResource TextColor}"
+                                                                FontSize="11"/>
+
+                                                        </Grid>
+                                                    </DataTemplate>
+                                                </ComboBox.ItemTemplate>
+
+                                            </ComboBox>
+
+                                            <!--Type-->
+                                            <TextBlock
+                                                Style="{DynamicResource TextBlock_RSP}"
+                                                Text="Type"/>
+                                            <ComboBox
+                                                x:Name="typeBox"
+                                                Grid.Row="1"
+                                                Grid.Column="2"
+                                                Height="30"
+                                                Margin="10,10,85,5"
+                                                VerticalAlignment="Bottom"
+                                                SelectedIndex="{Binding ElementName=mainWindow, Path=DataContext.SelectedTypeIndexEdit}">
+
+                                                <ComboBoxItem>
+                                                    <Grid>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="auto"/>
+                                                            <ColumnDefinition/>
+                                                        </Grid.ColumnDefinitions>
+
+                                                        <TextBlock
+                                                            Grid.Column="0"
+                                                            Foreground="White"
+                                                            Height="auto"
+                                                            VerticalAlignment="Center"
+                                                            Width="auto"
+                                                            Margin="2,0,0,0"
+                                                            Text="Incomes"/>
+
+                                                        <Image
+                                                            Grid.Column="2"
+                                                            HorizontalAlignment="Left"
+                                                            Margin="10,0,0,0"
+                                                            Source="Assets/income.png"
+                                                            Width="22"/>
+
+                                                    </Grid>
+                                                </ComboBoxItem>
+                                                <ComboBoxItem>
+                                                    <Grid>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="auto"/>
+                                                            <ColumnDefinition/>
+                                                        </Grid.ColumnDefinitions>
+
+                                                        <TextBlock
+                                                            Grid.Column="0"
+                                                            Foreground="White"
+                                                            Height="auto"
+                                                            VerticalAlignment="Center"
+                                                            Width="auto"
+                                                            Margin="2,0,0,0"
+                                                            Text="Expenses"/>
+
+                                                        <Image
+                                                            Grid.Column="2"
+                                                            HorizontalAlignment="Left"
+                                                            Margin="10,1,0,0"
+                                                            Source="Assets/expenses.png"
+                                                            Width="21"/>
+
+                                                    </Grid>
+                                                </ComboBoxItem>
+                                            </ComboBox>
+
+                                            <!--Description-->
+                                            <TextBlock
+                                                Style="{DynamicResource TextBlock_RSP}"
+                                                Text="Description"/>
+                                            <Grid>
+                                                <TextBox
+                                                    Style="{DynamicResource Dynamic_TextBox_RSP}"
+                                                    x:Name="enterDescription_tb4"
+                                                    Text="{Binding Description, UpdateSourceTrigger=PropertyChanged}"/>
+                                                <!--Hint-->
+                                                <TextBlock
+                                                    Foreground="Gray"
+                                                    IsHitTestVisible="False"
+                                                    Margin="10,10,20,0"
+                                                    Padding="10,8,0,0"
+                                                    FontSize="11"
+                                                    FontFamily="Century gothic"
+                                                    Text="Enter something">
+
+                                                    <TextBlock.Style>
+                                                        <Style TargetType="{x:Type TextBlock}">
+                                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding Text, ElementName=enterDescription_tb4}" Value="">
+                                                                    <Setter Property="Visibility" Value="Visible"/>
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </TextBlock.Style>
+
+                                                </TextBlock>
+                                            </Grid>
+
+                                        </StackPanel>
+
+                                    </ScrollViewer>
+
+                                    <Grid
+                                        Grid.Row="1">
+
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition/>
+                                            <ColumnDefinition Width="50"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <!--Editing Button-->
+                                        <Button
+                                            Grid.Row="1"
+                                            Style="{DynamicResource EditPanelButton_RSP}"
+                                            Command="{Binding ElementName=mainWindow, Path=DataContext.EditFinanceCommand}"
+                                            IsEnabled="{Binding ElementName=enterSum_tb4, Path=(Validation.HasError), Converter={StaticResource InverseB}}">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="20"/>
+                                                    <ColumnDefinition/>
+                                                </Grid.ColumnDefinitions>
+                                            </Grid>
+
+                                            <!--Closing the menu for editing finance (income or expense)-->
+                                            <Button.Triggers>
+                                                <EventTrigger RoutedEvent="Button.Click">
+                                                    <EventTrigger.Actions>
+                                                        <BeginStoryboard>
+                                                            <Storyboard>
+                                                                <DoubleAnimationUsingKeyFrames Storyboard.TargetName="dynamic_side_panel" Storyboard.TargetProperty="(FrameworkElement.Width)">
+                                                                    <EasingDoubleKeyFrame KeyTime="0:0:0.1" Value="0"/>
+                                                                </DoubleAnimationUsingKeyFrames>
+                                                            </Storyboard>
+                                                        </BeginStoryboard>
+                                                    </EventTrigger.Actions>
+                                                </EventTrigger>
+                                            </Button.Triggers>
+                                        </Button>
+
+                                        <!--Closing Button-->
+                                        <Button
+                                            Grid.Column="1"
+                                            Command="{Binding ElementName=mainWindow, Path=DataContext.CloseFinanceEditCommand}"
+                                            Style="{DynamicResource ClosePanelButton_RSP}">
+
+                                            <!--Closing the menu for editing finance (income or expense)-->
+                                            <Button.Triggers>
+                                                <EventTrigger RoutedEvent="Button.Click">
+                                                    <EventTrigger.Actions>
+                                                        <BeginStoryboard>
+                                                            <Storyboard>
+                                                                <DoubleAnimationUsingKeyFrames Storyboard.TargetName="dynamic_side_panel" Storyboard.TargetProperty="(FrameworkElement.Width)">
+                                                                    <EasingDoubleKeyFrame KeyTime="0:0:0.1" Value="0"/>
+                                                                </DoubleAnimationUsingKeyFrames>
+                                                            </Storyboard>
+                                                        </BeginStoryboard>
+                                                    </EventTrigger.Actions>
+                                                </EventTrigger>
+                                            </Button.Triggers>
+
+                                        </Button>
+                                    </Grid>
+                                </Grid>
+
+                            </TabItem>
+
+                            <!--Add new category (index 3)-->
+                            <TabItem
+                                Height="0">
+
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition/>
+                                        <RowDefinition Height="50"/>
+                                        <RowDefinition Height="10"/>
+                                    </Grid.RowDefinitions>
+
+                                    <ScrollViewer
+                                        Grid.Row="0">
+
+                                        <StackPanel>
+
+                                            <!--Title-->
+                                            <TextBlock
+                                                Style="{DynamicResource TextBlock_RSP}"
+                                                Text="Name"/>
+                                            <Grid>
+                                                <TextBox
+                                                    Style="{DynamicResource TextBox_RSP}"
+                                                    x:Name="enterTitle_tb5"
+                                                    Text="{Binding CategoryTitle, UpdateSourceTrigger=PropertyChanged}"/>
+
+                                                <!--Hint-->
+                                                <TextBlock
+                                                    Foreground="Gray"
+                                                    IsHitTestVisible="False"
+                                                    Margin="10,10,20,0"
+                                                    Padding="10,8,0,0"
+                                                    FontSize="11"
+                                                    TextElement.FontFamily="Fonts\#Century gothic"
+                                                    Text="Enter something">
+
+                                                    <TextBlock.Style>
+                                                        <Style TargetType="{x:Type TextBlock}">
+                                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding Text, ElementName=enterTitle_tb5}" Value="">
+                                                                    <Setter Property="Visibility" Value="Visible"/>
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </TextBlock.Style>
+
+                                                </TextBlock>
+                                            </Grid>
+
+                                            <!--Color-->
+                                            <TextBlock
+                                                Style="{DynamicResource TextBlock_RSP}"
+                                                Text="Color"/>
+                                            <materialDesign:ColorPicker 
+                                                x:Name="categoryColorPicker"
+                                                Height="120"
+                                                Margin="15,20,30,0"
+                                                Color="{Binding CategoryColorHex,  UpdateSourceTrigger=PropertyChanged}"/>
+                                            <Grid>
+                                                <TextBox
+                                                    Style="{DynamicResource TextBox_RSP}"
+                                                    x:Name="enter_color"
+                                                    Text="{Binding ElementName=categoryColorPicker, Path=Color, UpdateSourceTrigger=PropertyChanged}"/>
+
+                                                <!--Hint-->
+                                                <TextBlock
+                                                    Foreground="Gray"
+                                                    IsHitTestVisible="False"
+                                                    Margin="10,10,20,0"
+                                                    Padding="10,8,0,0"
+                                                    FontSize="11"
+                                                    TextElement.FontFamily="Fonts\#Century gothic"
+                                                    Text="Enter HEX-code">
+
+                                                    <TextBlock.Style>
+                                                        <Style TargetType="{x:Type TextBlock}">
+                                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding Text, ElementName=enter_color}" Value="">
+                                                                    <Setter Property="Visibility" Value="Visible"/>
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </TextBlock.Style>
+
+                                                </TextBlock>
+                                            </Grid>
+
+                                        </StackPanel>
+
+                                    </ScrollViewer>
+
+                                    <Grid
+                                        Grid.Row="1">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition/>
+                                            <ColumnDefinition Width="50"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <!--Adding Button-->
+                                        <Button
+                                            Grid.Row="1"
+                                            Style="{DynamicResource ButtonTemplateOpac}"
+                                            Background="#27292d"
+                                            Command="{Binding AddNewCategoryCommand}">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition/>
+                                                    <ColumnDefinition/>
+                                                </Grid.ColumnDefinitions>
+
+                                                <TextBlock
+                                                    Grid.Column="0"
+                                                    Foreground="White"
+                                                    Text="Add"
+                                                    FontWeight="Bold"
+                                                    FontSize="13"
+                                                    VerticalAlignment="Center"
+                                                    Padding="0,0,0,0"
+                                                    Margin="0,0,0,0"
+                                                    FontFamily="Century gothic"/>
+
+                                                <Border
+                                                    HorizontalAlignment="Right"
+                                                    Grid.Column="1"
+                                                    Height="25"
+                                                    Width="25"
+                                                    Margin="30,0,20,0"
+                                                    CornerRadius="5"
+                                                    Background="{StaticResource categoryColor}"/>
+
+                                            </Grid>
+
+
+                                            <!--Closing the menu for adding new category-->
+                                            <Button.Triggers>
+                                                <EventTrigger RoutedEvent="Button.Click">
+                                                    <EventTrigger.Actions>
+                                                        <BeginStoryboard>
+                                                            <Storyboard>
+                                                                <DoubleAnimationUsingKeyFrames Storyboard.TargetName="dynamic_side_panel" Storyboard.TargetProperty="(FrameworkElement.Width)">
+                                                                    <EasingDoubleKeyFrame KeyTime="0:0:0.1" Value="0"/>
+                                                                </DoubleAnimationUsingKeyFrames>
+                                                            </Storyboard>
+                                                        </BeginStoryboard>
+                                                    </EventTrigger.Actions>
+                                                </EventTrigger>
+                                            </Button.Triggers>
+                                        </Button>
+
+                                        <!--Closing Button-->
+                                        <Button
+                                            Grid.Column="1"
+                                            Style="{DynamicResource ClosePanelButton_RSP}">
+
+                                            <!--Closing the menu for adding new category-->
+                                            <Button.Triggers>
+                                                <EventTrigger RoutedEvent="Button.Click">
+                                                    <EventTrigger.Actions>
+                                                        <BeginStoryboard>
+                                                            <Storyboard>
+                                                                <DoubleAnimationUsingKeyFrames Storyboard.TargetName="dynamic_side_panel" Storyboard.TargetProperty="(FrameworkElement.Width)">
+                                                                    <EasingDoubleKeyFrame KeyTime="0:0:0.1" Value="0"/>
+                                                                </DoubleAnimationUsingKeyFrames>
+                                                            </Storyboard>
+                                                        </BeginStoryboard>
+                                                    </EventTrigger.Actions>
+                                                </EventTrigger>
+                                            </Button.Triggers>
+
+                                        </Button>
+                                    </Grid>
+
+                                </Grid>
+
+                            </TabItem>
+
+                            <!--Edit category (index 4)-->
+                            <TabItem
+                                Height="0">
+
+                                <Grid DataContext="{Binding SelectedCategoryItem}">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition/>
+                                        <RowDefinition Height="50"/>
+                                        <RowDefinition Height="10"/>
+                                    </Grid.RowDefinitions>
+
+                                    <ScrollViewer
+                                        Grid.Row="0">
+
+                                        <StackPanel>
+
+                                            <!--Title-->
+                                            <TextBlock
+                                                Style="{DynamicResource TextBlock_RSP}"
+                                                Text="Name"/>
+                                            <Grid>
+                                                <TextBox
+                                                    Style="{DynamicResource TextBox_RSP}"
+                                                    x:Name="enterTitle_tb6"
+                                                    Text="{Binding Title, UpdateSourceTrigger=PropertyChanged}"/>
+
+                                                <!--Hint-->
+                                                <TextBlock
+                                                    Foreground="Gray"
+                                                    IsHitTestVisible="False"
+                                                    Margin="10,10,20,0"
+                                                    Padding="10,8,0,0"
+                                                    FontSize="11"
+                                                    TextElement.FontFamily="Fonts\#Century gothic"
+                                                    Text="Enter something">
+
+                                                    <TextBlock.Style>
+                                                        <Style TargetType="{x:Type TextBlock}">
+                                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding Text, ElementName=enterTitle_tb6}" Value="">
+                                                                    <Setter Property="Visibility" Value="Visible"/>
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </TextBlock.Style>
+
+                                                </TextBlock>
+                                            </Grid>
+
+                                            <!--Color-->
+                                            <TextBlock
+                                                Style="{DynamicResource TextBlock_RSP}"
+                                                Text="Color"/>
+                                            <materialDesign:ColorPicker 
+                                                x:Name="categoryColorPickerEdit"
+                                                Height="120"
+                                                Margin="15,20,30,0"
+                                                Color="{Binding ColorHex, UpdateSourceTrigger=PropertyChanged}"/>
+                                            <Grid>
+                                                <TextBox
+                                                    Style="{DynamicResource TextBox_RSP}"
+                                                    x:Name="enter_color_edit"
+                                                    Text="{Binding ElementName=categoryColorPickerEdit, Path=Color, UpdateSourceTrigger=PropertyChanged}"/>
+
+                                                <!--Hint-->
+                                                <TextBlock
+                                                    Foreground="Gray"
+                                                    IsHitTestVisible="False"
+                                                    Margin="10,10,20,0"
+                                                    Padding="10,8,0,0"
+                                                    FontSize="11"
+                                                    TextElement.FontFamily="Fonts\#Century gothic"
+                                                    Text="Enter HEX-code">
+
+                                                    <TextBlock.Style>
+                                                        <Style TargetType="{x:Type TextBlock}">
+                                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding Text, ElementName=enter_color_edit}" Value="">
+                                                                    <Setter Property="Visibility" Value="Visible"/>
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </TextBlock.Style>
+
+                                                </TextBlock>
+                                            </Grid>
+
+                                        </StackPanel>
+
+                                    </ScrollViewer>
+
+                                    <Grid
+                                        Grid.Row="1">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition/>
+                                            <ColumnDefinition Width="50"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <!--Editing Button-->
+                                        <Button
+                                            Grid.Row="1"
+                                            Style="{DynamicResource ButtonTemplateOpac}"
+                                            Background="#27292d"
+                                            Command="{Binding ElementName=mainWindow, Path=DataContext.EditCategoryCommand}"
+                                            CommandParameter="{Binding ElementName=mainWindow}">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="20"/>
+                                                    <ColumnDefinition/>
+                                                </Grid.ColumnDefinitions>
+
+                                                <TextBlock
+                                                    Grid.Column="1"
+                                                    Foreground="White"
+                                                    Text="Change"
+                                                    FontWeight="Bold"
+                                                    FontSize="13"
+                                                    VerticalAlignment="Center"
+                                                    Padding="0,0,0,0"
+                                                    Margin="0,0,60,0"
+                                                    FontFamily="Century gothic"/>
+
+                                                <Border
+                                                    HorizontalAlignment="Right"
+                                                    Grid.Column="1"
+                                                    Height="25"
+                                                    Width="25"
+                                                    Margin="0,0,10,0"
+                                                    CornerRadius="5"
+                                                    Background="{StaticResource categoryColorEdit}"/>
+                                            </Grid>
+
+                                            <!--Closing the menu for editing category-->
+                                            <Button.Triggers>
+                                                <EventTrigger RoutedEvent="Button.Click">
+                                                    <EventTrigger.Actions>
+                                                        <BeginStoryboard>
+                                                            <Storyboard>
+                                                                <DoubleAnimationUsingKeyFrames Storyboard.TargetName="dynamic_side_panel" Storyboard.TargetProperty="(FrameworkElement.Width)">
+                                                                    <EasingDoubleKeyFrame KeyTime="0:0:0.1" Value="0"/>
+                                                                </DoubleAnimationUsingKeyFrames>
+                                                            </Storyboard>
+                                                        </BeginStoryboard>
+                                                    </EventTrigger.Actions>
+                                                </EventTrigger>
+                                            </Button.Triggers>
+                                        </Button>
+
+                                        <!--Closing Button-->
+                                        <Button
+                                            Command="{Binding ElementName=mainWindow, Path=DataContext.CloseCategoryEditCommand}"
+                                            Grid.Column="1"
+                                            Style="{DynamicResource ClosePanelButton_RSP}">
+
+                                            <!--Closing the menu for editing category-->
+                                            <Button.Triggers>
+                                                <EventTrigger RoutedEvent="Button.Click">
+                                                    <EventTrigger.Actions>
+                                                        <BeginStoryboard>
+                                                            <Storyboard>
+                                                                <DoubleAnimationUsingKeyFrames Storyboard.TargetName="dynamic_side_panel" Storyboard.TargetProperty="(FrameworkElement.Width)">
+                                                                    <EasingDoubleKeyFrame KeyTime="0:0:0.1" Value="0"/>
+                                                                </DoubleAnimationUsingKeyFrames>
+                                                            </Storyboard>
+                                                        </BeginStoryboard>
+                                                    </EventTrigger.Actions>
+                                                </EventTrigger>
+                                            </Button.Triggers>
+
+                                        </Button>
+                                    </Grid>
+
+                                </Grid>
+
+                            </TabItem>
+
+                        </TabControl>
+                    </Grid>
+                </Border>
+
+            </Grid>
+
+        </Grid>
+
+        <!--Main panel-->
+        <Grid
+            Grid.Row="0"
+            Grid.RowSpan="2"
+            Grid.Column="1">
+            
+            <Grid.RowDefinitions>
+                <RowDefinition Height="35"/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+
+            <Border
+                BorderThickness="0,0,0,1"
+                BorderBrush="#27292d">
+                <!--Main current sum-->
+                <Grid
+                    HorizontalAlignment="Left"
+                    Width="auto"
+                    Margin="15,5,0,0">
+
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition Width="0.5*"/>
+                        <ColumnDefinition Width="150"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock
+                        Text="{Binding MainCurrentSum, UpdateSourceTrigger=PropertyChanged, StringFormat=N2}"
+                        Foreground="White"
+                        FontWeight="Medium"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Center"
+                        FontSize="13"
+                        Margin="0,0,1,0"/>
+
+                    <Image
+                        Grid.Column="1"
+                        Source="Assets/hryvnia.png"
+                        Width="18"/>
+
+                    <TextBlock
+                        Grid.Column="2"
+                        FontSize="10"
+                        VerticalAlignment="Center"
+                        Margin="5,0,0,0">
+
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="TextElement.FontFamily" Value="Fonts\#Century gothic"/>
+                                <Setter Property="Foreground" Value="Gray" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding CurrencyWarningState}" Value="True">
+                                        <Setter Property="Foreground" Value="Yellow" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+
+                        <TextBlock.Text>
+                            <MultiBinding StringFormat="USD - {0:F2}; EUR - {1:F2}">
+                                <Binding Path="UsdToUah" />
+                                <Binding Path="EurToUah" />
+                            </MultiBinding>
+                        </TextBlock.Text>
+                    </TextBlock>
+
+                </Grid>
+            </Border>
+
+            <!--"Not found" hint-->
+            <TextBlock
+                    Grid.Row="1"
+                    Foreground="LightGray"
+                    FontSize="15"
+                    TextElement.FontFamily="Fonts\#Century gothic"
+                    TextAlignment="Center"
+                    Width="250"
+                    TextWrapping="Wrap"
+                    VerticalAlignment="Center"
+                    Margin="0,0,0,50"
+                    Text="Nothing found :(">
+
+                <TextBlock.Style>
+                    <Style TargetType="TextBlock">
+                        <Setter Property="Visibility" Value="Visible"/>
+
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding ElementName=mainListbox, Path=HasItems}" Value="True">
+                                <Setter Property="Visibility" Value="Hidden"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBlock.Style>
+
+            </TextBlock>
+
+            <!--Finance list-->
+            <ListBox
+                x:Name="mainListbox"
+                Grid.Row="1"
+                VirtualizingStackPanel.IsVirtualizing="True"
+                Margin="0,5,0,15"
+                Background="Transparent"
+                BorderThickness="0,0,0,0"
+                ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                ItemsSource="{Binding sortedFinanceItems, UpdateSourceTrigger=PropertyChanged}"
+                SelectedItem="{Binding SelectedFinanceItem, UpdateSourceTrigger=PropertyChanged}"
+                SelectedIndex="{Binding SelectedFinanceItemIndex, UpdateSourceTrigger=PropertyChanged}">
+                <ListBox.Resources>
+                    <Style TargetType="ListBoxItem">
+                        <Setter Property="Height" Value="60"/>
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate>
+                                    <Border x:Name="bd"
+                                            Margin="3"
+                                            CornerRadius="5"
+                                            Background="Transparent">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="2*"/>
+                                                <ColumnDefinition/>
+                                            </Grid.ColumnDefinitions>
+
+                                            <!--title, category and date-->
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="50"/>
+                                                    <ColumnDefinition/>
+                                                </Grid.ColumnDefinitions>
+
+                                                <!--Color square-->
+                                                <Border
+                                                    Height="35"
+                                                    Width="35"
+                                                    CornerRadius="8"
+                                                    BorderThickness="2"
+                                                    BorderBrush="#27292d"
+                                                    Background="{Binding Color}"
+                                                    HorizontalAlignment="Center"
+                                                    Margin="5,0,0,0"/>
+
+                                                <!--Title-->
+                                                <TextBlock
+                                                    Grid.Column="1"
+                                                    Margin="0,7,50,0"
+                                                    VerticalAlignment="Top"
+                                                    Foreground="White"
+                                                    FontSize="15"
+                                                    Text="{Binding Title}"
+                                                    Width="auto"
+                                                    HorizontalAlignment="Left"
+                                                    Padding="15,0,30,0"/>
+
+                                                <StackPanel
+                                                    Grid.Column="1"
+                                                    Orientation="Horizontal">
+
+                                                    <!--Date-->
+                                                    <TextBlock
+                                                        Margin="0,0,0,7"
+                                                        VerticalAlignment="Bottom"
+                                                        Foreground="Gray"
+                                                        FontSize="12"
+                                                        Text="{Binding Date}"
+                                                        Width="auto"
+                                                        TextAlignment="Left"
+                                                        Padding="15,0,10,0"/>
+
+                                                    <!--Time-->
+                                                    <TextBlock
+                                                        Margin="0,0,0,7"
+                                                        VerticalAlignment="Bottom"
+                                                        FontSize="12"
+                                                        Foreground="Gray"
+                                                        Width="auto"
+                                                        Text="{Binding Time}"/>
+
+                                                </StackPanel>
+
+                                            </Grid>
+
+                                            <Grid
+                                                Grid.Column="1">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition/>
+                                                    <ColumnDefinition Width="70"/>
+                                                </Grid.ColumnDefinitions>
+
+                                                <!--remove and edit buttons-->
+                                                <Grid
+                                                    Grid.Column="2"
+                                                    HorizontalAlignment="Right"
+                                                    Margin="0,0,10,0">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition/>
+                                                        <ColumnDefinition/>
+                                                    </Grid.ColumnDefinitions>
+
+                                                    <Button
+                                                        x:Name="editItem"
+                                                        Grid.Column="0"
+                                                        Margin="0,0,6,0"
+                                                        Style="{DynamicResource ButtonTemplateOpac}"
+                                                        Command="{Binding ElementName=mainWindow, Path=DataContext.SwitchToEditFinance}"
+                                                        Visibility="Hidden">
+
+                                                        <Image
+                                                            Source="Assets/edit2.png"
+                                                            Width="17"/>
+
+                                                        <Button.Triggers>
+                                                            <EventTrigger RoutedEvent="Button.Click">
+                                                                <EventTrigger.Actions>
+                                                                    <BeginStoryboard>
+                                                                        <Storyboard TargetProperty="Width" Target="{Binding ElementName=dynamic_side_panel}">
+                                                                            <DoubleAnimation
+                                                                                    From="0"
+                                                                                    To="230"
+                                                                                    Duration="0:0:0.1"/>
+                                                                        </Storyboard>
+                                                                    </BeginStoryboard>
+                                                                </EventTrigger.Actions>
+                                                            </EventTrigger>
+                                                        </Button.Triggers>
+
+                                                    </Button>
+
+                                                    <Button
+                                                        x:Name="removeItem"
+                                                        Grid.Column="1"
+                                                        Margin="0,0,5,0"
+                                                        Style="{DynamicResource ButtonTemplateOpac}"
+                                                        Command="{Binding ElementName=mainWindow, Path=DataContext.RemoveFinanceCommand}"
+                                                        Visibility="Hidden">
+
+                                                        <Image
+                                                            Source="Assets/delete.png"
+                                                            Width="17"/>
+                                                    </Button>
+
+                                                </Grid>
+
+                                                <StackPanel
+                                                    Orientation="Horizontal">
+
+                                                    <!--Sign (+ or -)-->
+                                                    <TextBlock
+                                                        VerticalAlignment="Center"
+                                                        Foreground="{Binding SumColor}"
+                                                        FontFamily="Century gothic"
+                                                        FontSize="16"
+                                                        FontWeight="Bold"
+                                                        Text="{Binding Sign}"
+                                                        Width="auto"
+                                                        TextAlignment="Right"/>
+                                                    
+                                                    <!--money-->
+                                                    <TextBlock
+                                                        Margin="0,0,0,0"
+                                                        VerticalAlignment="Center"
+                                                        Foreground="{Binding SumColor}"
+                                                        FontSize="16"
+                                                        FontWeight="Bold"
+                                                        Text="{Binding Sum, UpdateSourceTrigger=PropertyChanged}"
+                                                        Width="auto"
+                                                        TextAlignment="Right"
+                                                        Padding="0,0,5,0"/>
+
+                                                    <!--currency (USD, UAH, EUR)-->
+                                                    <TextBlock
+                                                        Grid.Column="0"
+                                                        Margin="0,0,0,0"
+                                                        VerticalAlignment="Center"
+                                                        Foreground="{Binding SumColor}"
+                                                        FontSize="16"
+                                                        FontWeight="Bold"
+                                                        Text="{Binding Currency}"
+                                                        Width="auto"
+                                                        TextAlignment="Right"
+                                                        Padding="0,0,10,0"/>
+
+                                                </StackPanel>
+
+                                            </Grid>
+
+                                        </Grid>
+
+                                        <Border.ToolTip>
+                                            <ToolTip
+                                                Content="{Binding Description}"
+                                                Width="auto"/>
+                                        </Border.ToolTip>
+                                    </Border>
+
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter Property="Background" TargetName="bd" Value="#1f2023"/>
+                                        </Trigger>
+                                        <Trigger Property="Selector.IsSelected"  Value="True">
+                                            <Setter Property="Background" TargetName="bd" Value="#27292d"/>
+                                            <Setter Property="Visibility" TargetName="removeItem" Value="Visible"/>
+                                            <Setter Property="Visibility" TargetName="editItem" Value="Visible"/>
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </ListBox.Resources>
+            </ListBox>
+        </Grid>
+
+        <!--Right Side panel (Menu, profile, filter, convert)-->
+        <Grid
+            Background="#1a1c1d"
+            Width="35"
+            HorizontalAlignment="Left"
+            Grid.Row="0"
+            Grid.RowSpan="2">
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="35"/>
+                <RowDefinition Height="35"/>
+                <RowDefinition Height="35"/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+
+            <!--Switch to Excel panel-->
+            <Button
+                Width="35"
+                Grid.Row="1"
+                Command="{Binding SwitchToExcelConverterPanel}"
+                Style="{DynamicResource ButtonTemplate}">
+
+                <Image
+                    Source="Assets/exel.png"
+                    Width="22"/>
+
+                <!--Showing the menu for converting data to excel file-->
+                <Button.Triggers>
+                    <EventTrigger RoutedEvent="Button.Click">
+                        <EventTrigger.Actions>
+                            <BeginStoryboard>
+                                <Storyboard>
+                                    <DoubleAnimationUsingKeyFrames Storyboard.TargetName="right_dynamic_panel" Storyboard.TargetProperty="(FrameworkElement.Width)">
+                                        <EasingDoubleKeyFrame KeyTime="0:0:0.1" Value="250"/>
+                                    </DoubleAnimationUsingKeyFrames>
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </EventTrigger.Actions>
+                    </EventTrigger>
+                </Button.Triggers>
+
+                <Button.ToolTip>
+                    <ToolTip>Converting</ToolTip>
+                </Button.ToolTip>
+            </Button>
+
+            <Button
+                Command="{Binding SwitchToCurrencyPanel}"
+                Grid.Row="2"
+                Style="{DynamicResource ButtonTemplate}">
+
+                <Image
+                    Source="Assets/currencyIcon.png"
+                    Width="25"/>
+
+                <Button.Triggers>
+                    <EventTrigger RoutedEvent="Button.Click">
+                        <EventTrigger.Actions>
+                            <BeginStoryboard>
+                                <Storyboard>
+                                    <DoubleAnimationUsingKeyFrames Storyboard.TargetName="right_dynamic_panel" Storyboard.TargetProperty="(FrameworkElement.Width)">
+                                        <EasingDoubleKeyFrame KeyTime="0:0:0.1" Value="250"/>
+                                    </DoubleAnimationUsingKeyFrames>
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </EventTrigger.Actions>
+                    </EventTrigger>
+                </Button.Triggers>
+
+                <Button.ToolTip>
+                    <ToolTip>Currency</ToolTip>
+                </Button.ToolTip>
+
+            </Button>
+            
+            <Image
+                Grid.Row="3"
+                VerticalAlignment="Bottom"
+                Width="18"
+                Margin="0,0,0,15">
+
+                <Image.Style>
+                    <Style TargetType="Image">
+                        <Setter Property="Source" Value="Assets/hasUpdated4.png"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsListUpdating}" Value="True">
+                                <Setter Property="Source" Value="Assets\steelUpdatingTime.png" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Image.Style>
+
+            </Image>
+            
+            <!--<Button
+                Grid.Row="2"
+                Command="{Binding TestCommand}"/>-->
+        </Grid>
+
+        <!--Title bar-->
+        <Grid
+            x:Name="TitleBar"
+            Margin="0,1,0,0"
+            Grid.Row="0"
+            Grid.Column="0"
+            Grid.ColumnSpan="3"
+            WindowChrome.IsHitTestVisibleInChrome="True">
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="70"/>
+                <ColumnDefinition Width="35"/>
+                <ColumnDefinition Width="35"/>
+                <ColumnDefinition Width="35"/>
+                <ColumnDefinition Width="35"/>
+            </Grid.ColumnDefinitions>
+
+            <!--Close Button-->
+            <Button 
+                Style="{DynamicResource TitleButtonTemplate}"
+                Grid.Column="5"
+                WindowChrome.IsHitTestVisibleInChrome="True"
+                x:Name="closeWindow"
+                Command="{Binding CloseWindowCommand}"
+                CommandParameter="{Binding ElementName=mainWindow}">
+                
+                <Image
+                    Source="Assets/closeButton.png"
+                    Style="{DynamicResource TitleImage}"/>
+                <Button.ToolTip>
+                    <ToolTip>Close</ToolTip>
+                </Button.ToolTip>
+            </Button>
+
+            <!--State Change Button (Full / Normal)-->
+            <Button 
+                Style="{DynamicResource TitleButtonTemplate}"
+                Grid.Column="4"
+                WindowChrome.IsHitTestVisibleInChrome="True"
+                Command="{Binding StateChangeCommand}"
+                CommandParameter="{Binding ElementName=mainWindow}"
+                x:Name="changeStateWindow">
+                
+                <Image
+                    Source="Assets/stateChangeSq.png"
+                    Style="{DynamicResource TitleImage}"/>
+            </Button>
+
+            <!--Minimize button-->
+            <Button 
+                Style="{DynamicResource TitleButtonTemplate}"
+                Grid.Column="3"
+                WindowChrome.IsHitTestVisibleInChrome="True"
+                Command="{Binding MinimizeWindowCommand}"
+                CommandParameter="{Binding ElementName=mainWindow}"
+                x:Name="minimizeWindow">
+                
+                <Image
+                    Source="Assets/minimize.png"
+                    Style="{DynamicResource TitleImage}"/>
+                <Button.ToolTip>
+                    <ToolTip>Minimize</ToolTip>
+                </Button.ToolTip>
+            </Button>
+
+            <!--Pin or Unpin button-->
+            <Button 
+                Style="{DynamicResource TitleButtonTemplate}"
+                Grid.Column="2"
+                WindowChrome.IsHitTestVisibleInChrome="True"
+                x:Name="pinWindow"
+                Command="{Binding PinUnpinCommand}"
+                CommandParameter="{Binding ElementName=mainWindow}">
+                
+                <Image
+                    Width="18">
+
+                    <Image.Style>
+                        <Style TargetType="Image">
+                            <Setter Property="Source" Value="Assets/pin.png"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsPinned}" Value="True">
+                                    <Setter Property="Source" Value="Assets\unpin.png" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Image.Style>
+                </Image>
+                <Button.ToolTip>
+                    <ToolTip>Topmost</ToolTip>
+                </Button.ToolTip>
+            </Button>
+
+            <!--Tray active button-->
+            <ToggleButton
+                x:Name="trayChecked"
+                Grid.Column="1"
+                Style="{DynamicResource titleToggleStyle}"
+                IsChecked="{Binding IsTrayActive, UpdateSourceTrigger=PropertyChanged}">
+                <ToggleButton.ToolTip>
+                    <ToolTip>Tray</ToolTip>
+                </ToggleButton.ToolTip>
+            </ToggleButton>
+
+            <!--Filter Button-->
+            <Button
+                HorizontalAlignment="Left"
+                Width="35"
+                Command="{Binding SwitchToFilterPanel}"
+                Style="{DynamicResource ButtonTemplate}">
+
+                <Image
+                    Source="Assets/sortIcon.png"
+                    Width="20"/>
+
+                <!--Showing the menu for sorting finance data-->
+                <Button.Triggers>
+                    <EventTrigger RoutedEvent="Button.Click">
+                        <EventTrigger.Actions>
+                            <BeginStoryboard>
+                                <Storyboard>
+                                    <DoubleAnimationUsingKeyFrames Storyboard.TargetName="right_dynamic_panel" Storyboard.TargetProperty="(FrameworkElement.Width)">
+                                        <EasingDoubleKeyFrame KeyTime="0:0:0.1" Value="250"/>
+                                    </DoubleAnimationUsingKeyFrames>
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </EventTrigger.Actions>
+                    </EventTrigger>
+                </Button.Triggers>
+
+                <Button.ToolTip>
+                    <ToolTip>Filtering</ToolTip>
+                </Button.ToolTip>
+            </Button>
+
+        </Grid>
+
+        <!--Dynamic right side panel-->
+        <Border
+            x:Name="right_dynamic_panel"
+            Background="#1a1c1d"
+            Grid.RowSpan="2"
+            Grid.ColumnSpan="1"
+            Width="0"
+            HorizontalAlignment="Left">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition Height="55"/>
+                    <RowDefinition Height="15"/>
+                </Grid.RowDefinitions>
+                
+                <TabControl
+                    Background="Transparent"
+                    BorderThickness="0"
+                    SelectedIndex="{Binding SelectedRightPanelIndex, UpdateSourceTrigger=PropertyChanged}">
+
+                    <!--Filters-->
+                    <TabItem
+                        Height="0">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="50"/>
+                                <RowDefinition/>
+                                <RowDefinition Height="20"/>
+                            </Grid.RowDefinitions>
+
+                            <!--Header-->
+                            <TextBlock
+                                    Foreground="White"
+                                    Text="Filters"
+                                    FontWeight="Bold"
+                                    FontSize="18"
+                                    Padding="15,18,0,0"/>
+
+                            <!--Fast switch button-->
+                            <Button
+                                Grid.Row="0"
+                                Height="30"
+                                Width="30"
+                                VerticalAlignment="Bottom"
+                                HorizontalAlignment="Right"
+                                Margin="0,0,20,5"
+                                BorderThickness="0"
+                                Background="#27292d"
+                                Command="{Binding SwitchToExcelConverterPanel}"
+                                Style="{DynamicResource RoundButtonTemplate}">
+
+                                <Image
+                                    Source="Assets/exel.png"
+                                    Width="20"/>
+
+                            </Button>
+
+                            <StackPanel
+                                Orientation="Vertical"
+                                Grid.Row="1">
+                                
+                                <!--Sort by Sum-->
+                                <TextBlock
+      	                            Text="By cost:"
+                                    Style="{DynamicResource TextBlock_LSP}"/>
+                                <Grid>
+                                    <ComboBox
+                                        Height="30"
+                                        x:Name="allOrSum"
+                                        SelectedIndex="{Binding SortingSumIndex, UpdateSourceTrigger=PropertyChanged}"
+                                        Width="120"
+                                        Margin="20,10,15,0"
+                                        HorizontalAlignment="Left"
+                                        VerticalAlignment="Bottom">
+
+                                        <ComboBoxItem>All</ComboBoxItem>
+                                        <ComboBoxItem>
+                                            <Grid>
+                                                <TextBox
+                                                        x:Name="enterCost_tb"
+                                                        Text="{Binding SortingSum, 
+                                                        UpdateSourceTrigger=PropertyChanged, StringFormat=N2}"
+                                                        Padding="2,1,0,0"
+                                                        Margin="0,0,20,0"
+                                                        FontSize="11"
+                                                        Style="{DynamicResource EmptyTextBoxStyle}">
+
+                                                    <i:Interaction.Behaviors>
+                                                        <vm:LimitBehaviour/>
+                                                    </i:Interaction.Behaviors>
+
+                                                </TextBox>
+                                            </Grid>
+                                        </ComboBoxItem>
+
+                                    </ComboBox>
+
+                                    <!--Currency-->
+                                    <ComboBox
+                                        Width="80"
+                                        Margin="140,0,5,0"
+                                        Height="30"
+                                        VerticalAlignment="Bottom"
+                                        SelectedIndex="{Binding SortingCurrencyIndex, UpdateSourceTrigger=PropertyChanged}">
+
+                                        <ComboBoxItem>All</ComboBoxItem>
+                                        <ComboBoxItem>
+                                            <StackPanel
+                                                Orientation="Horizontal">
+                                                <TextBlock
+                                                    Foreground="{StaticResource TextColor}"
+                                                    Text="USD"
+                                                    VerticalAlignment="Center"
+                                                    Margin="0,0,5,0"/>
+                                                <Image
+                                                    Source="Assets/dollar.png"
+                                                    Width="20"
+                                                    HorizontalAlignment="Left"/>
+                                            </StackPanel>
+                                        </ComboBoxItem>
+                                        <ComboBoxItem>
+                                            <StackPanel
+                                                Orientation="Horizontal">
+                                                <TextBlock
+                                                    Foreground="{StaticResource TextColor}"
+                                                    Text="EUR"
+                                                    VerticalAlignment="Center"
+                                                    Margin="0,0,5,0"/>
+                                                <Image
+                                                    Source="Assets/euro.png"
+                                                    Width="20"
+                                                    HorizontalAlignment="Left"/>
+                                            </StackPanel>
+                                        </ComboBoxItem>
+                                        <ComboBoxItem>
+                                            <StackPanel
+                                                Orientation="Horizontal">
+                                                <TextBlock
+                                                    Foreground="{StaticResource TextColor}"
+                                                    Text="UAH"
+                                                    VerticalAlignment="Center"
+                                                    Margin="0,0,3,0"/>
+                                                <Image
+                                                    Source="Assets/hryvnia.png"
+                                                    Width="20"
+                                                    HorizontalAlignment="Left"/>
+                                            </StackPanel>
+                                        </ComboBoxItem>
+
+                                    </ComboBox>
+                                </Grid>
+
+                                <!--Sort by date-->
+                                <TextBlock
+      	                            Text="By date:"
+                                    Style="{DynamicResource TextBlock_LSP}"/>
+                                <ComboBox
+                                    Grid.Row="1"
+                                    Grid.Column="1"
+                                    Height="30"
+                                    Width="200"
+                                    HorizontalAlignment="Left"
+                                    Margin="20,10,10,5"
+                                    SelectedIndex="{Binding SortingDateIndex, UpdateSourceTrigger=PropertyChanged}">
+
+                                    <ComboBoxItem>All</ComboBoxItem>
+                                    <ComboBoxItem>
+                                        <Grid>
+                                            <DatePicker 
+                                                Name="datePicker1" 
+                                                SelectedDate="{Binding SortingDate}"
+                                                IsDropDownOpen="True" 
+                                                Width="auto"
+                                                SelectedDateFormat="Long"
+                                                HorizontalAlignment="Left"
+                                                Style="{DynamicResource DatePickerStyle}"
+                                                CalendarStyle="{DynamicResource CalendarStyle}">
+                                            </DatePicker>
+
+                                        </Grid>
+                                    </ComboBoxItem>
+                                </ComboBox>
+
+                                <!--Sort by type-->
+                                <TextBlock
+                                    Style="{DynamicResource TextBlock_LSP}"
+      	                            Text="By type:"/>
+                                <ComboBox
+                                    Height="30"
+                                    Width="150"
+                                    Margin="20,10,10,5"
+                                    HorizontalAlignment="Left"
+                                    SelectedIndex="{Binding SortingTypeIndex, UpdateSourceTrigger=PropertyChanged}">
+
+                                    <ComboBoxItem>All</ComboBoxItem>
+                                    <ComboBoxItem>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="auto"/>
+                                                <ColumnDefinition/>
+                                            </Grid.ColumnDefinitions>
+
+                                            <TextBlock
+                                                Grid.Column="0"
+                                                Foreground="White"
+                                                Height="auto"
+                                                VerticalAlignment="Center"
+                                                Width="auto"
+                                                Margin="2,0,0,0"
+                                                Text="Incomes"/>
+                                            <Image
+                                                Grid.Column="2"
+                                                HorizontalAlignment="Left"
+                                                Margin="10,0,0,0"
+                                                Source="Assets/income.png"
+                                                Width="22"/>
+                                        </Grid>
+                                    </ComboBoxItem>
+                                    <ComboBoxItem>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="auto"/>
+                                                <ColumnDefinition/>
+                                            </Grid.ColumnDefinitions>
+
+                                            <TextBlock
+                                                Grid.Column="0"
+                                                Foreground="White"
+                                                Height="auto"
+                                                VerticalAlignment="Center"
+                                                Width="auto"
+                                                Margin="2,0,0,0"
+                                                Text="Expenses"/>
+                                            <Image
+                                                Grid.Column="2"
+                                                HorizontalAlignment="Left"
+                                                Margin="10,1,0,0"
+                                                Source="Assets/expenses.png"
+                                                Width="21"/>
+                                        </Grid>
+                                    </ComboBoxItem>
+                                </ComboBox>
+
+                                <!--Sort by category-->
+                                <TextBlock
+                                    Style="{DynamicResource TextBlock_LSP}"
+      	                            Text="By category:"/>
+                                <ComboBox
+                                    Height="30"
+                                    Margin="20,10,10,5"
+                                    Width="150"
+                                    HorizontalAlignment="Left"
+                                    SelectedIndex="{Binding SortingCategoryIndex}"
+                                    SelectedItem="{Binding SortingCategory, UpdateSourceTrigger=PropertyChanged}"
+                                    ItemsSource="{Binding category_sort_items}">
+
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="30"/>
+                                                    <ColumnDefinition/>
+                                                </Grid.ColumnDefinitions>
+
+                                                <Border
+                                                    Grid.Column="0"
+                                                    Width="15"
+                                                    HorizontalAlignment="Left"
+                                                    Margin="3,0,0,0"
+                                                    Height="15"
+                                                    CornerRadius="3"
+                                                    BorderThickness="0"
+                                                    Background="{Binding ColorHex}"/>
+
+                                                <TextBlock
+                                                    Grid.Column="1"
+                                                    Text="{Binding Title}"
+                                                    Foreground="{StaticResource TextColor}"
+                                                    FontSize="11"/>
+
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
+
+                                <!--Apply Button-->
+                                <Button
+                                    Content="Apply"
+                                    Command="{Binding ApplyFiltersCommand}"
+                                    Style="{DynamicResource ApplyButtonStyle_LSP}"
+                                    IsEnabled="{Binding ElementName=enterCost_tb, Path=(Validation.HasError), Converter={StaticResource InverseB}}">
+                                </Button>
+
+                          
+                            </StackPanel>
+
+                            <!--Matches-->
+                            <Grid
+                                Grid.Row="2">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="auto"/>
+                                    <ColumnDefinition/>
+                                </Grid.ColumnDefinitions>
+
+                                <TextBlock
+                                    Foreground="Gray"
+                                    Padding="10,0,0,0"
+                                    FontSize="12"
+                                    Text="Matches found:"/>
+                                <TextBlock
+                                    Grid.Column="1"
+                                    Text="{Binding ElementName=mainListbox, Path=Items.Count, UpdateSourceTrigger=PropertyChanged}"
+                                    FontWeight="Bold"
+                                    Padding="4,0,0,0"
+                                    Foreground="Gray"
+                                    FontSize="12"/>
+                            </Grid>
+    
+                        </Grid>
+                    </TabItem>
+
+                    <!--Convert to Excel-->
+                    <TabItem
+                        Height="0">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="50"/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+
+                            <!--Header-->
+                            <TextBlock
+                                    Foreground="White"
+                                    TextElement.FontFamily="Fonts\#Century gothic"
+                                    Text="Converting"
+                                    FontWeight="Bold"
+                                    FontSize="18"
+                                    Margin="0,0,0,10"
+                                    Padding="15,18,0,0"/>
+
+                            <!--Fast switch button-->
+                            <Button
+                                Grid.Row="0"
+                                Height="30"
+                                Width="30"
+                                VerticalAlignment="Bottom"
+                                HorizontalAlignment="Right"
+                                Margin="0,0,20,5"
+                                BorderThickness="0"
+                                Background="#27292d"
+                                Command="{Binding SwitchToFilterPanel}"
+                                Style="{DynamicResource RoundButtonTemplate}">
+
+                                <Image
+                                    Source="Assets/sortIcon.png"
+                                    Width="20"/>
+
+                            </Button>
+
+                            <StackPanel
+                                Orientation="Vertical"
+                                Grid.Row="1">
+
+                                <!--Name-->
+                                <TextBlock
+                                    Style="{DynamicResource TextBlock_LSP}"
+      	                            Text="Name:"/>
+                                <Grid>
+                                    <TextBox
+                                        x:Name="enterName"
+                                        Style="{DynamicResource DarkTextBoxStyle}"
+                                        Text="{Binding ConvertedFileName, UpdateSourceTrigger=PropertyChanged}"
+                                        Height="30"
+                                        Foreground="White"
+                                        Margin="15,10,15,0"
+                                        Padding="5,7,5,0"
+                                        FontSize="11"
+                                        Grid.ColumnSpan="1"
+                                        BorderThickness="1"
+                                        BorderBrush="#27292d">
+
+                                        <i:Interaction.Behaviors>
+                                            <vm:LimitPathBehavior/>
+                                        </i:Interaction.Behaviors>
+
+                                    </TextBox>
+                                    <TextBlock
+                                        IsHitTestVisible="False"
+                                        Grid.Row="1"
+                                        Foreground="Gray"
+                                        FontSize="11"
+                                        Padding="24,18,0,0"
+                                        Text="Enter name of file"
+                                        TextElement.FontFamily="Fonts\#Century gothic">
+
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="Visibility" Value="Collapsed"/>
+
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding Text, ElementName=enterName}" Value="">
+                                                        <Setter Property="Visibility" Value="Visible"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+
+                                    </TextBlock>
+                                </Grid>
+
+                                <!--Selecting path-->
+                                <TextBlock
+                                    Style="{DynamicResource TextBlock_LSP}"
+      	                            Text="Catalog selection:"/>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition Width="0.3*"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <TextBox
+                                        x:Name="selectPath"
+                                        Style="{DynamicResource DarkTextBoxStyle}"
+                                        Text="{Binding ExcelFilePath, UpdateSourceTrigger=PropertyChanged}"
+                                        Height="30"
+                                        Foreground="White"
+                                        Margin="15,10,15,0"
+                                        Padding="5,8,5,0"
+                                        FontSize="10.5"
+                                        Grid.ColumnSpan="1"
+                                        BorderThickness="1"
+                                        BorderBrush="#27292d">
+                                    </TextBox>
+                                    <TextBlock
+                                        IsHitTestVisible="False"
+                                        Grid.Row="1"
+                                        Foreground="Gray"
+                                        FontSize="11"
+                                        Padding="25,18,0,0"
+                                        Text="Select directory"
+                                        TextElement.FontFamily="Fonts\#Century gothic">
+
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="Visibility" Value="Collapsed"/>
+
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding Text, ElementName=selectPath}" Value="">
+                                                        <Setter Property="Visibility" Value="Visible"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+
+                                    </TextBlock>
+                                    <Button
+                                        Grid.Column="1"
+                                        Background="{StaticResource someStyleColor}"
+                                        Height="30"
+                                        Width="30"
+                                        HorizontalAlignment="Left"
+                                        Margin="0,10,0,0"
+                                        BorderThickness="0"
+                                        Command="{Binding SelectExcelPathCommand}"
+                                        Style="{DynamicResource RoundButtonTemplate}">
+
+                                        <Image
+                                        Source="Assets/folder2.png"
+                                        Width="20"/>
+
+                                    </Button>
+                                </Grid>
+
+                                <!--Selecting category-->
+                                <TextBlock
+	                                Margin="0,10,0,0"
+      	                            VerticalAlignment="top"
+      	                            Foreground="{StaticResource TextColor}"
+      	                            FontSize="12"
+      	                            Text="Category:"
+      	                            Width="auto"
+      	                            TextAlignment="Left"
+      	                            Padding="20,5,10,0"/>
+                                <ComboBox
+                                    Height="30"
+                                    Margin="20,10,10,5"
+                                    Width="150"
+                                    HorizontalAlignment="Left"
+                                    SelectedIndex="{Binding SelectedConvertingCategoryIndex}"
+                                    SelectedItem="{Binding SelectedConvertingCategory, UpdateSourceTrigger=PropertyChanged}"
+                                    ItemsSource="{Binding category_sort_items}">
+
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="30"/>
+                                                    <ColumnDefinition/>
+                                                </Grid.ColumnDefinitions>
+
+                                                <Border
+                                                    Grid.Column="0"
+                                                    Width="15"
+                                                    HorizontalAlignment="Left"
+                                                    Margin="3,0,0,0"
+                                                    Height="15"
+                                                    CornerRadius="3"
+                                                    BorderThickness="0"
+                                                    Background="{Binding ColorHex}"/>
+
+                                                <TextBlock
+                                                    Grid.Column="1"
+                                                    Text="{Binding Title}"
+                                                    Foreground="{StaticResource TextColor}"
+                                                    TextElement.FontFamily="Fonts\#Century gothic"
+                                                    FontSize="11"/>
+
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
+
+                                <!--Use filtered items or all from data base-->
+                                <TextBlock
+                                    Style="{DynamicResource TextBlock_LSP}"
+      	                            Text="From sorted:"/>
+                                <ToggleButton
+                                    Grid.Row="5"
+                                    Cursor="Hand"
+                                    Style="{DynamicResource toggleStyle}"
+                                    HorizontalAlignment="Left"
+                                    Margin="20,10,0,0"
+                                    VerticalAlignment="Top"
+                                    IsChecked="{Binding IsUsingSorted, UpdateSourceTrigger=PropertyChanged}"/>
+
+                                <!--Convert Button / Progress--> 
+                                <Grid>
+                                    <!--Convert Button-->
+                                    <Button
+                                        Command="{Binding ConvertToExcelCommand}"
+                                        Content="Convert"
+                                        Visibility="{Binding ConvertButtonVisible, UpdateSourceTrigger=PropertyChanged}"
+                                        Style="{DynamicResource ApplyButtonStyle_LSP}"/>
+
+                                    <!--Progress-->
+                                    <ProgressBar
+                                        Margin="0,20,0,0"
+                                        Width="200"
+                                        Height="20"
+                                        Visibility="{Binding ConvertProgressVisible, UpdateSourceTrigger=PropertyChanged}"
+                                        Foreground="Green"
+                                        Value="{Binding ConvertProgressBarValue, UpdateSourceTrigger=PropertyChanged}"
+                                        Style="{DynamicResource ProgressStyle}"/>
+
+                                </Grid>
+
+                            </StackPanel>
+
+                            
+                        </Grid>
+                    </TabItem>
+
+                    <!--Currency info-->
+                    <TabItem
+                        Height="0">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="50"/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+
+                            <!--Header-->
+                            <TextBlock
+                                    Foreground="White"
+                                    Text="Currency"
+                                    FontWeight="Bold"
+                                    FontSize="18"
+                                    Padding="15,18,0,0"/>
+
+                            <StackPanel
+                                Grid.Row="1">
+
+                                <!--Dollar to hryvnia-->
+                                <Grid
+                                    Height="50">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="auto"/>
+                                        <ColumnDefinition Width="auto"/>
+                                        <ColumnDefinition Width="auto"/>
+                                        <ColumnDefinition Width="auto"/>
+                                        <ColumnDefinition Width="auto"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <TextBlock
+                                        Grid.Column="0"
+                                        Foreground="White"
+                                        Text="1"
+                                        Margin="15,0,0,0"
+                                        FontWeight="Bold"
+                                        FontSize="17"
+                                        VerticalAlignment="Center"/>
+                                    
+                                    <Image
+                                        Grid.Column="1"
+                                        Source="Assets/dollar.png"
+                                        Width="20"
+                                        Margin="0,0,5,0"/>
+
+                                    <TextBlock
+                                        Grid.Column="2"
+                                        Foreground="White"
+                                        Text="="
+                                        Margin="0,0,0,0"
+                                        FontWeight="Bold"
+                                        FontSize="15"
+                                        VerticalAlignment="Center"/>
+
+                                    <TextBox
+                                        x:Name="usd_uah_text"
+                                        Grid.Column="3"
+                                        Style="{DynamicResource DarkTextBoxStyle}"
+                                        Height="30"
+                                        Width="auto"
+                                        HorizontalAlignment="Left"
+                                        Foreground="White"
+                                        Margin="10,0,0,0"
+                                        Padding="5,6,5,0"
+                                        FontSize="12"
+                                        MaxWidth="145"
+                                        MinWidth="45"
+                                        Text="{Binding UsdToUah, UpdateSourceTrigger=PropertyChanged, StringFormat=N2}">
+
+                                        <i:Interaction.Behaviors>
+                                            <vm:LimitBehaviour/>
+                                        </i:Interaction.Behaviors>
+
+                                    </TextBox>
+
+                                    <Image
+                                        Grid.Column="4"
+                                        Source="Assets/hryvnia.png"
+                                        Width="20"
+                                        Margin="0,0,5,0"/>
+
+                                </Grid>
+
+                                <!--Euro to hryvnia-->
+                                <Grid
+                                    Height="50">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="auto"/>
+                                        <ColumnDefinition Width="auto"/>
+                                        <ColumnDefinition Width="auto"/>
+                                        <ColumnDefinition Width="auto"/>
+                                        <ColumnDefinition Width="auto"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <TextBlock
+                                        Grid.Column="0"
+                                        Foreground="White"
+                                        Text="1"
+                                        Margin="15,0,0,0"
+                                        FontWeight="Bold"
+                                        FontSize="17"
+                                        VerticalAlignment="Center"/>
+
+                                    <Image
+                                        Grid.Column="1"
+                                        Source="Assets/euro.png"
+                                        Width="20"
+                                        Margin="0,0,5,0"/>
+
+                                    <TextBlock
+                                        Grid.Column="2"
+                                        Foreground="White"
+                                        Text="="
+                                        Margin="0,0,0,0"
+                                        FontWeight="Bold"
+                                        FontSize="15"
+                                        VerticalAlignment="Center"/>
+
+                                    <TextBox
+                                        x:Name="eur_uah_text"
+                                        Grid.Column="3"
+                                        Style="{DynamicResource DarkTextBoxStyle}"
+                                        Height="30"
+                                        Width="auto"
+                                        HorizontalAlignment="Left"
+                                        Foreground="White"
+                                        Margin="10,0,0,0"
+                                        Padding="5,6,5,0"
+                                        FontSize="12"
+                                        MaxWidth="145"
+                                        MinWidth="45"
+                                        Text="{Binding EurToUah, UpdateSourceTrigger=PropertyChanged, StringFormat=N2}">
+
+                                        <i:Interaction.Behaviors>
+                                            <vm:LimitBehaviour/>
+                                        </i:Interaction.Behaviors>
+
+                                    </TextBox>
+
+                                    <Image
+                                        Grid.Column="4"
+                                        Source="Assets/hryvnia.png"
+                                        Width="20"
+                                        Margin="0,0,5,0"/>
+
+                                </Grid>
+
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition/>
+                                    </Grid.ColumnDefinitions>
+                                    <!--Apply-->
+                                    <Button
+                                        Margin="15,10,0,0"
+                                        Content="Apply"
+                                        Command="{Binding ApplyCurrencySettings}"
+                                        Style="{DynamicResource ApplyButtonStyle_LSP}">
+                                    </Button>
+
+                                    <Image
+                                        Width="25"
+                                        Grid.Column="1"
+                                        HorizontalAlignment="Left"
+                                        VerticalAlignment="Bottom"
+                                        Margin="15,0,0,5">
+                                        <Image.Style>
+                                            <Style TargetType="Image">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding CurrencyWarningState}" Value="True">
+                                                        <Setter Property="Source" Value="Assets\warningIcon.png" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Image.Style>
+                                    </Image>
+                                </Grid>
+
+                            </StackPanel>
+                            
+                        </Grid>
+                    </TabItem>
+
+                </TabControl>
+
+                <!--Close right side panel-->
+                <Border
+                    Grid.Row="1"
+                    BorderBrush="Gray"
+                    BorderThickness="0,0.5,0,0.5">
+
+                    <Grid>
+                        <Button
+                            Background="Transparent"
+                            BorderBrush="Gray"
+                            Width="80"
+                            Margin="0,0.5,0,0.5"
+                            Style="{DynamicResource ButtonTemplate}">
+                            <Image
+                                Source="Assets/closeButton.png"
+                                Width="20"/>
+
+                            <!--Closing the panel with internal menu for sorting and converting-->
+                            <Button.Triggers>
+                                <EventTrigger RoutedEvent="Button.Click">
+                                    <EventTrigger.Actions>
+                                        <BeginStoryboard>
+                                            <Storyboard>
+                                                <DoubleAnimationUsingKeyFrames Storyboard.TargetName="right_dynamic_panel" Storyboard.TargetProperty="(FrameworkElement.Width)">
+                                                    <EasingDoubleKeyFrame KeyTime="0:0:0.1" Value="0"/>
+                                                </DoubleAnimationUsingKeyFrames>
+                                            </Storyboard>
+                                        </BeginStoryboard>
+                                    </EventTrigger.Actions>
+                                </EventTrigger>
+                            </Button.Triggers>
+
+                        </Button>
+                    </Grid>
+                </Border>
+
+            </Grid>
+        </Border>
+
+    </Grid>
+</Window>
