@@ -2,7 +2,7 @@
 
 ![Preview](Images/aca_img1.png)
 
-**"Accounting App"** - is an application designed for accounting work, maintaining a list of income and expenses by categories in three currencies <u>**(USD, EUR, UAH)**</u>, developed using **WPF .NET Core**. Core functionality includes:
+**"Accounting App"** - is a project application designed for accounting work, maintaining a list of income and expenses by categories in three currencies <u>**(USD, EUR, UAH)**</u>, developed using **WPF .NET Core**. Core functionality includes:
 - Manipulation of the list of financial elements (Income / Expense)
 - Categorisation of financial items 
 - Sorting of financial items
