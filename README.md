@@ -2,11 +2,16 @@
 
 ![Preview](Images/aca_img1.png)
 
+## Languages
+- [Українська](./README_UA.md)
+- [Русский](./README_RU.md)
+- [English](./README.md)
+
 **"Accounting App"** - is a project application designed for accounting work, maintaining a list of income and expenses by categories in three currencies <u>**(USD, EUR, UAH)**</u>, developed using **WPF .NET Core**. Core functionality includes:
-- Manipulation of the list of financial elements (Income / Expense)
-- Categorisation of financial items 
-- Sorting of financial items
-- Converting the list of financial items to an Excel spreadsheet
+- Manipulation of the list of financial elements (Income / Expense);
+- Categorisation of financial items;
+- Sorting of financial items;
+- Converting the list of financial items to an Excel spreadsheet.
 
 ## Adding a new financial element:
 
@@ -78,5 +83,5 @@ There is no actual way to retrieve currency data in the application, it must be 
 
 There is also a summarised value of all income and expenses in hryvnia (UAH) at the top right of the ***"Sort"*** button.
 
-### Conclusion:
+## Conclusion:
 To summarise the above, "Accounting App" has a user-friendly and understandable interface, sufficient but specialised functionality.
